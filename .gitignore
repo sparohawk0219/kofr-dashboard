@@ -1,8 +1,10 @@
 # secrets
 .streamlit/secrets.toml
 
-# local docs
+# local only
 SYSTEM.md
+archive/
+pusher.log
 .env
 
 # local DB
