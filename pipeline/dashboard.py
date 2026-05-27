@@ -39,6 +39,24 @@ def load_history(days: int = 120):
 
 st.set_page_config(page_title='KOFR OIS Market Making', layout='wide', page_icon='💹')
 
+# ── 비밀번호 보호 ──────────────────────────────────────────────────────
+def _check_password() -> bool:
+    if st.session_state.get('_auth'):
+        return True
+    st.title('💹  KOFR OIS Market Making')
+    pwd = st.text_input('비밀번호', type='password')
+    if st.button('로그인'):
+        correct = (st.secrets.get('app_password') or os.environ.get('APP_PASSWORD', ''))
+        if pwd == correct:
+            st.session_state['_auth'] = True
+            st.rerun()
+        else:
+            st.error('비밀번호가 틀렸습니다')
+    return False
+
+if not _check_password():
+    st.stop()
+
 if not _USE_CLOUD:
     init_db(DB_PATH)
 
