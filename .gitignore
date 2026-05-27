@@ -1,0 +1,32 @@
+# secrets
+.streamlit/secrets.toml
+.env
+
+# local DB
+*.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# analysis / one-off scripts (not part of the app)
+*.pdf
+*.pdf_p*
+*.png
+*.csv
+*.json
+_bbg_diag.py
+basis_analysis*
+bok_cd_kofr*
+bok_meeting_path*
+bok_rate_implied*
+bok_sensitivity*
+build_curves.py
+cd_content.txt
+extract_images.py
+extracted*.txt
+forward_paths*
+ocr_results*
+plot_short_term.py
+run_ocr.py
