@@ -681,7 +681,7 @@ with tab3:
 
 
 # ── auto-refresh ───────────────────────────────────────────────────────
-if not _USE_CLOUD:
-    st.caption(f'Next refresh in {REFRESH_SEC}s')
-    time.sleep(REFRESH_SEC)
-    st.rerun()
+_refresh_sec = REFRESH_SEC if not _USE_CLOUD else 90
+st.caption(f'Next refresh in {_refresh_sec}s')
+time.sleep(_refresh_sec)
+st.rerun()
