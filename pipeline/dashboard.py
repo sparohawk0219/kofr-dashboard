@@ -25,12 +25,15 @@ from pipeline.store import init_db, seed_history, clear_history, load_history as
 
 # ── Supabase or local ─────────────────────────────────────────────────
 _USE_CLOUD = False
+_cloud_err = ''
 try:
     if 'supabase' in st.secrets:
         from pipeline import cloud_store
         _USE_CLOUD = True
-except Exception:
-    pass
+    else:
+        _cloud_err = 'secrets에 [supabase] 섹션 없음'
+except Exception as e:
+    _cloud_err = str(e)
 
 def load_history(days: int = 120):
     if _USE_CLOUD:
@@ -93,6 +96,8 @@ with _hdr_right:
         if st.button('🔄 새로고침 요청', use_container_width=True):
             cloud_store.request_refresh()
             st.info('Bloomberg PC에 요청 전송 — 약 1분 내 업데이트됩니다.')
+    elif _cloud_err:
+        st.warning(f'Supabase 연결 실패: {_cloud_err}')
 
 tab1, tab2, tab3 = st.tabs(['📊 베이시스 트레이딩', '🎯 금통위 시나리오', '💰 캐리 분석'])
 
