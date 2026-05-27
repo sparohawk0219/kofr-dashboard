@@ -23,7 +23,7 @@ def save_tick(kofr: dict, cd: dict, basis: dict, zscore: dict, signals: list):
     row = dict(
         ts=ts,
         kofr_on=kofr.get('ON'),
-        kofr_1w=kofr.get('1W'), kofr_2w=kofr.get('2W'),
+        kofr_1w=kofr.get('1W'),
         kofr_1m=kofr.get('1M'), kofr_2m=kofr.get('2M'),
         kofr_3m=kofr.get('3M'), kofr_6m=kofr.get('6M'), kofr_9m=kofr.get('9M'),
         kofr_1y=kofr.get('1Y'), kofr_2y=kofr.get('2Y'), kofr_3y=kofr.get('3Y'),
@@ -104,7 +104,7 @@ def load_latest_rates() -> tuple[dict, dict] | tuple[None, None]:
         r = res.data[0]
         kofr = {k: r[v] for k, v in [
             ('ON','kofr_on'),
-            ('1W','kofr_1w'),('2W','kofr_2w'),
+            ('1W','kofr_1w'),
             ('1M','kofr_1m'),('2M','kofr_2m'),
             ('3M','kofr_3m'),('6M','kofr_6m'),('9M','kofr_9m'),
             ('1Y','kofr_1y'),('2Y','kofr_2y'),('3Y','kofr_3y'),
