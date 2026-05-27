@@ -90,3 +90,24 @@ def last_update() -> str | None:
         return res.data[0]['ts'] if res.data else None
     except Exception:
         return None
+
+
+def load_latest_rates() -> tuple[dict, dict] | tuple[None, None]:
+    """Supabase 최신 행에서 kofr/cd 딕셔너리 복원."""
+    try:
+        c = _client()
+        res = c.table('basis_history').select('*').order('ts', desc=True).limit(1).execute()
+        if not res.data:
+            return None, None
+        r = res.data[0]
+        kofr = {k: r[v] for k, v in [
+            ('ON','kofr_on'),('3M','kofr_3m'),('6M','kofr_6m'),('9M','kofr_9m'),
+            ('1Y','kofr_1y'),('2Y','kofr_2y'),('3Y','kofr_3y'),
+        ] if r.get(v) is not None}
+        cd = {k: r[v] for k, v in [
+            ('3M','cd_3m'),('6M','cd_6m'),('9M','cd_9m'),
+            ('1Y','cd_1y'),('2Y','cd_2y'),('3Y','cd_3y'),
+        ] if r.get(v) is not None}
+        return kofr, cd
+    except Exception:
+        return None, None

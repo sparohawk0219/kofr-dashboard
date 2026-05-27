@@ -52,18 +52,26 @@ def _seed_once():
 _seed_once()
 
 # ── fetch ──────────────────────────────────────────────────────────────
-kofr, cd   = fetch_rates(KOFR_RATES_SNAPSHOT, CD_RATES_SNAPSHOT)
+if _USE_CLOUD:
+    _cloud_kofr, _cloud_cd = cloud_store.load_latest_rates()
+    if _cloud_kofr and _cloud_cd:
+        kofr, cd = _cloud_kofr, _cloud_cd
+        src = '🟢 Bloomberg (Supabase)'
+    else:
+        kofr, cd = fetch_rates(KOFR_RATES_SNAPSHOT, CD_RATES_SNAPSHOT)
+        src = '🟡 Mock (Supabase 데이터 없음)'
+else:
+    import time as _t
+    kofr, cd = fetch_rates(KOFR_RATES_SNAPSHOT, CD_RATES_SNAPSHOT)
+    if _PROVIDER == 'bloomberg':
+        age   = int(_t.time() - _bbg_last_ts) if _bbg_last_ts else None
+        stale = f' ⚠️{age}s stale' if age and age > 60 else ''
+        src   = f'🟢 Bloomberg{stale}'
+    else:
+        src = '🟡 Mock' if _PROVIDER == 'mock' else '🔵 Infomax'
+
 fwd_rows   = forward_rates_table(kofr, cd)
 anchor_bps = fwd_rows[0]['basis_bps'] if fwd_rows else 19.5
-
-# ── source indicator ───────────────────────────────────────────────────
-import time as _t
-if _PROVIDER == 'bloomberg':
-    age   = int(_t.time() - _bbg_last_ts) if _bbg_last_ts else None
-    stale = f' ⚠️{age}s stale' if age and age > 60 else ''
-    src   = f'🟢 Bloomberg{stale}'
-else:
-    src = '🟡 Mock' if _PROVIDER == 'mock' else '🔵 Infomax'
 
 # ── last update (cloud) ────────────────────────────────────────────────
 _last_upd_str = ''
