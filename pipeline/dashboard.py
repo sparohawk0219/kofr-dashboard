@@ -95,7 +95,7 @@ with _hdr_right:
     if _USE_CLOUD:
         if st.button('🔄 새로고침 요청', use_container_width=True):
             cloud_store.request_refresh()
-            st.info('Bloomberg PC에 요청 전송 — 약 1분 내 업데이트됩니다.')
+            st.toast('Bloomberg PC에 요청 전송 — 약 1분 내 업데이트됩니다.')
     elif _cloud_err:
         st.warning(f'Supabase 연결 실패: {_cloud_err}')
 
