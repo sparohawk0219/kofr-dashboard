@@ -58,8 +58,8 @@ if _USE_CLOUD:
         kofr, cd = _cloud_kofr, _cloud_cd
         src = '🟢 Bloomberg (Supabase)'
     else:
-        kofr, cd = fetch_rates(KOFR_RATES_SNAPSHOT, CD_RATES_SNAPSHOT)
-        src = '🟡 Mock (Supabase 데이터 없음)'
+        kofr, cd = dict(KOFR_RATES_SNAPSHOT), dict(CD_RATES_SNAPSHOT)
+        src = '⏳ Bloomberg PC 데이터 대기 중'
 else:
     import time as _t
     kofr, cd = fetch_rates(KOFR_RATES_SNAPSHOT, CD_RATES_SNAPSHOT)
