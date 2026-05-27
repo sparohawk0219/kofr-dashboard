@@ -59,17 +59,17 @@ if _USE_CLOUD:
     _cloud_kofr, _cloud_cd = cloud_store.load_latest_rates()
     if _cloud_kofr and _cloud_cd:
         kofr, cd = _cloud_kofr, _cloud_cd
-        src = '🟢 Bloomberg (Supabase)'
+        src = '🟢 실시간 데이터'
     else:
         kofr, cd = dict(KOFR_RATES_SNAPSHOT), dict(CD_RATES_SNAPSHOT)
-        src = '⏳ Bloomberg PC 데이터 대기 중'
+        src = '⏳ 데이터 수신 대기 중'
 else:
     import time as _t
     kofr, cd = fetch_rates(KOFR_RATES_SNAPSHOT, CD_RATES_SNAPSHOT)
     if _PROVIDER == 'bloomberg':
         age   = int(_t.time() - _bbg_last_ts) if _bbg_last_ts else None
         stale = f' ⚠️{age}s stale' if age and age > 60 else ''
-        src   = f'🟢 Bloomberg{stale}'
+        src   = f'🟢 실시간 데이터{stale}'
     else:
         src = '🟡 Mock' if _PROVIDER == 'mock' else '🔵 Infomax'
 
@@ -95,7 +95,7 @@ with _hdr_right:
     if _USE_CLOUD:
         if st.button('🔄 새로고침 요청', use_container_width=True):
             cloud_store.request_refresh()
-            st.toast('Bloomberg PC에 요청 전송 — 약 1분 내 업데이트됩니다.')
+            st.toast('데이터 업데이트 요청 전송 — 약 1분 내 업데이트됩니다.')
     elif _cloud_err:
         st.warning(f'Supabase 연결 실패: {_cloud_err}')
 
@@ -293,8 +293,8 @@ with tab1:
         with st.expander('포워드 베이시스 텀프리미엄 분석', expanded=False):
             btn_col, _ = st.columns([2, 5])
             with btn_col:
-                if not _USE_CLOUD and st.button('Bloomberg 히스토리 업데이트 (1년)', type='primary'):
-                    with st.spinner('Bloomberg BDH 로딩 중...'):
+                if not _USE_CLOUD and st.button('히스토리 업데이트 (1년)', type='primary'):
+                    with st.spinner('히스토리 로딩 중...'):
                         from pipeline.fetcher import fetch_history
                         records = fetch_history(days=365)
                         clear_history(DB_PATH)
@@ -347,7 +347,7 @@ with tab1:
                                           yaxis_title='bps', legend=dict(orientation='h'))
                     st.plotly_chart(fig_hp, use_container_width=True)
             else:
-                st.info('히스토리 데이터 없음 — Bloomberg 연결 후 위 버튼 클릭')
+                st.info('히스토리 데이터 없음 — 위 버튼으로 업데이트 필요')
 
             with st.expander('포워드 버킷 분해 (내부 분석용)', expanded=False):
                 if fwd_rows:
@@ -371,8 +371,8 @@ with tab2:
     with st.expander('KOFR overnight vs 기준금리 basis (조정 참고용)', expanded=False):
         upd_col, diag_col = st.columns([2, 5])
         with upd_col:
-            if not _USE_CLOUD and st.button('Bloomberg 히스토리 업데이트', key='upd_tab2'):
-                with st.spinner('Bloomberg BDH 로딩 중...'):
+            if not _USE_CLOUD and st.button('히스토리 업데이트', key='upd_tab2'):
+                with st.spinner('히스토리 로딩 중...'):
                     from pipeline.fetcher import fetch_history
                     records = fetch_history(days=365)
                     clear_history(DB_PATH)
@@ -411,7 +411,7 @@ with tab2:
             st.plotly_chart(fig_on, use_container_width=True)
             default_adj = on_mean
         else:
-            st.info('Bloomberg 히스토리 업데이트 필요')
+            st.info('히스토리 업데이트 필요')
             default_adj = 0.0
 
     # ── 입력 컨트롤 ─────────────────────────────────────────────────
@@ -548,11 +548,11 @@ with tab3:
             'KOFR ON (%)',
             value=kofr_on_db,
             step=0.001, format='%.4f',
-            help='Bloomberg KRFRRATE Index. DB 미연결 시 수동 입력',
+            help='KOFR ON 금리. DB 미연결 시 수동 입력',
         )
     with t3c2:
         st.caption(
-            f'Bloomberg DB 최근값: **{kofr_on_db:.4f}%**  '
+            f'DB 최근값: **{kofr_on_db:.4f}%**  '
             f'(기준금리 {BOK_RATE:.2f}% {(kofr_on_db - BOK_RATE)*100:+.1f}bp)  '
             f'|  3M CD: **{cd.get("3M", 0):.3f}%**'
         )
