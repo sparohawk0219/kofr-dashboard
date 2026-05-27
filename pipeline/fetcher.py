@@ -122,9 +122,6 @@ async def stream_rates(on_tick, kofr_codes: dict, cd_codes: dict):
 # ════════════════════════════════════════════════════════════
 
 _bbg_session = None        # singleton session
-_bbg_last_kofr: dict = {}  # last good Bloomberg snapshot
-_bbg_last_cd:   dict = {}
-_bbg_last_ts:   float = 0.0
 
 def _get_bbg_session():
     global _bbg_session
