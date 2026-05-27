@@ -1,6 +1,6 @@
 streamlit
 pandas
 plotly
-supabase
-schedule
 scipy
+schedule
+supabase>=2.0.0
