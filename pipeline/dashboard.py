@@ -175,16 +175,15 @@ with tab1:
                 signal = '⚪ 관망'
 
             mm_rows.append({
-                'Tenor':      t,
-                'CD IRS':     f'{c:.4f}%',
-                'Fair basis': f'{fb:.1f}bp',
-                'KOFR Fair':  f'{fair:.4f}%',
-                'KOFR Mkt':   f'{k:.4f}%',
-                'Gap':        f'{gap:+.2f}bp',
-                'Bid':        f'{bid:.4f}%',
-                'Ask':        f'{ask:.4f}%',
-                '시그널':     signal,
-                '_gap':       gap,
+                'Tenor':     t,
+                'CD IRS':    f'{c:.4f}%',
+                'KOFR Fair': f'{fair:.4f}%',
+                'KOFR Mkt':  f'{k:.4f}%',
+                'Gap':       f'{gap:+.2f}bp',
+                'Bid':       f'{bid:.4f}%',
+                'Ask':       f'{ask:.4f}%',
+                '시그널':    signal,
+                '_gap':      gap,
             })
 
         def _row_color(row):
@@ -196,7 +195,7 @@ with tab1:
             return [''] * len(row)
 
         df_mm = pd.DataFrame(mm_rows)
-        display_cols = ['Tenor', 'CD IRS', 'Fair basis', 'KOFR Fair', 'KOFR Mkt', 'Gap', 'Bid', 'Ask', '시그널']
+        display_cols = ['Tenor', 'CD IRS', 'KOFR Fair', 'KOFR Mkt', 'Gap', 'Bid', 'Ask', '시그널']
         st.dataframe(
             df_mm[display_cols + ['_gap']].style.apply(_row_color, axis=1),
             use_container_width=True, height=212, hide_index=True,
