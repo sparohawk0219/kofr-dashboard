@@ -105,16 +105,19 @@ def forward_rates_table(kofr: dict, cd: dict) -> list[dict]:
     Returns list of dicts per period:
       { period, fwd_kofr, fwd_cd, basis_bps, meetings, n_meetings }
     """
-    _D = {'3M': 92, '6M': 184, '9M': 275, '1Y': 365}
+    _D = {'3M': 92, '6M': 184, '9M': 275, '1Y': 365, '2Y': 731, '3Y': 1096}
     _END = {
         '3M': date(2026,  8, 19), '6M': date(2026, 11, 19),
         '9M': date(2027,  2, 19), '1Y': date(2027,  5, 19),
+        '2Y': date(2028,  5, 19), '3Y': date(2029,  5, 19),
     }
     periods = [
         ('Spot-3M', None,  '3M'),
         ('3M-6M',   '3M',  '6M'),
         ('6M-9M',   '6M',  '9M'),
         ('9M-1Y',   '9M',  '1Y'),
+        ('1Y-2Y',   '1Y',  '2Y'),
+        ('2Y-3Y',   '2Y',  '3Y'),
     ]
 
     def _ois_fwd(curve: dict, t1, t2: str) -> float | None:

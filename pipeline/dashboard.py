@@ -73,8 +73,19 @@ else:
     else:
         src = '🟡 Mock' if _PROVIDER == 'mock' else '🔵 Infomax'
 
-fwd_rows   = forward_rates_table(kofr, cd)
-anchor_bps = fwd_rows[0]['basis_bps'] if fwd_rows else 19.5
+fwd_rows = forward_rates_table(kofr, cd)
+
+# ── 앵커: 사이드바에서 수동 설정, 디폴트 = Spot-3M 베이시스
+_spot3m_default = round((cd.get('3M', 2.85) - kofr.get('3M', 2.62)) * 100, 1)
+with st.sidebar:
+    st.markdown('### ⚙️ 앵커 설정')
+    anchor_bps = st.number_input(
+        'Fair basis 앵커 (bp)',
+        min_value=0.0, max_value=100.0,
+        value=float(_spot3m_default),
+        step=0.5, format='%.1f',
+        help='CD-KOFR 공정 베이시스. 디폴트 = 현재 Spot-3M 베이시스.',
+    )
 
 # ── last update (cloud) ────────────────────────────────────────────────
 _last_upd_str = ''
@@ -88,7 +99,7 @@ _hdr_left, _hdr_right = st.columns([8, 2])
 with _hdr_left:
     st.caption(
         f'{src}  |  {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}  '
-        f'|  BOK 기준금리 2.50%  |  신용앵커 (Spot-3M) **{anchor_bps:.2f}bp**'
+        f'|  BOK 기준금리 2.50%  |  앵커 **{anchor_bps:.2f}bp**'
         f'{_last_upd_str}'
     )
 with _hdr_right:
@@ -192,7 +203,7 @@ with tab1:
             column_config={'_gap': None},
         )
         st.caption(
-            f'Fair basis = Spot-3M 앵커 {anchor_bps:.1f}bp  '
+            f'Fair basis = 앵커 {anchor_bps:.1f}bp'
             f'🔴 수취: gap>+{RECV_THR}bp (캐리 +3bp)  '
             f'🔵 지급: gap<−{PAY_THR}bp (역사적 상위 11%, 캐리 -3bp)'
         )
@@ -353,9 +364,23 @@ with tab1:
                 if fwd_rows:
                     fd_cols = ['period', 'fwd_kofr', 'fwd_cd', 'basis_bps']
                     df_fwd  = pd.DataFrame(fwd_rows)[fd_cols].copy()
-                    df_fwd['vs 앵커'] = (df_fwd['basis_bps'] - anchor_bps).round(2)
-                    df_fwd.columns    = ['기간', 'fwd KOFR(%)', 'fwd CD(%)', '베이시스(bp)', 'vs앵커(bp)']
+                    df_fwd['앵커여부'] = df_fwd['period'].apply(lambda p: '—' if p == 'Spot-3M' else '✓')
+                    df_fwd['vs 앵커'] = df_fwd.apply(
+                        lambda row: '—' if row['period'] == 'Spot-3M'
+                        else round(row['basis_bps'] - anchor_bps, 2), axis=1)
+                    df_fwd.columns = ['기간', 'fwd KOFR(%)', 'fwd CD(%)', '베이시스(bp)', '앵커포함', 'vs앵커(bp)']
                     st.dataframe(df_fwd, use_container_width=True, hide_index=True)
+
+                    _sp3m = next((r for r in fwd_rows if r['period'] == 'Spot-3M'), None)
+                    if _sp3m is not None:
+                        _dist = round(_sp3m['basis_bps'] - anchor_bps, 2)
+                        dc1, dc2, dc3 = st.columns(3)
+                        dc1.metric('Spot-3M 선도베이시스', f"{_sp3m['basis_bps']:.2f}bp")
+                        dc2.metric('앵커 (사이드바 설정값)', f'{anchor_bps:.2f}bp')
+                        dc3.metric('단기왜곡 (Spot-3M − 앵커)',
+                                   f'{_dist:+.2f}bp',
+                                   delta=f'{"CD 단기 공급왜곡" if _dist > 3 else "정상 범위"}',
+                                   delta_color='inverse' if _dist > 3 else 'off')
 
 
 # ══════════════════════════════════════════════════════════════════════
