@@ -202,10 +202,17 @@ with tab1:
             use_container_width=True, height=212, hide_index=True,
             column_config={'_gap': None},
         )
+        # 역사적 지급 신호 발생 빈도 (basis_2y > anchor + PAY_THR)
+        _pay_pct_str = ''
+        if not hist_df.empty and 'basis_2y' in hist_df.columns:
+            _b2y = hist_df['basis_2y'].dropna()
+            if len(_b2y) >= 20:
+                _pay_pct = round((_b2y > anchor_bps + PAY_THR).mean() * 100, 0)
+                _pay_pct_str = f'역사적 상위 {_pay_pct:.0f}%, '
         st.caption(
-            f'Fair basis = 앵커 {anchor_bps:.1f}bp'
-            f'🔴 수취: gap>+{RECV_THR}bp (캐리 +3bp)  '
-            f'🔵 지급: gap<−{PAY_THR}bp (역사적 상위 11%, 캐리 -3bp)'
+            f'Fair basis = 앵커 {anchor_bps:.1f}bp  |  '
+            f'🔴 수취: gap>+{RECV_THR:.1f}bp (캐리 +{RECV_THR:.1f}bp)  |  '
+            f'🔵 지급: gap<−{PAY_THR:.1f}bp ({_pay_pct_str}캐리 −{PAY_THR:.1f}bp)'
         )
 
         # ── 2. Gap 차트 + Basis 커브 ──────────────────────────────────
